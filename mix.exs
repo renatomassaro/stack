@@ -22,6 +22,7 @@ defmodule Stack.Mixfile do
         "coveralls.json": :test,
         "coveralls.post": :test
       ],
+      dialyzer: [plt_add_apps: [:mix]],
       source_url: "https://github.com/renatomassaro/stack",
       docs: docs()
     ]
@@ -52,6 +53,7 @@ defmodule Stack.Mixfile do
   def deps do
     [
       {:ex_doc, "~> 0.35", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:excoveralls, "~> 0.18", only: :test}
     ]
   end
