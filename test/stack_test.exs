@@ -7,6 +7,24 @@ defmodule StackTest do
   @stack_123 @stack_12 |> Stack.push(3)
   @stack_1234 @stack_123 |> Stack.push(4)
 
+  describe "to_list/1" do
+    test "dumps the stack into a list" do
+      assert Stack.to_list(@empty) == []
+      assert Stack.to_list(@stack_1) == [1]
+      assert Stack.to_list(@stack_12) == [1, 2]
+      assert Stack.to_list(@stack_123) == [1, 2, 3]
+    end
+  end
+
+  describe "from_list/1" do
+    test "creates a stack from the list, obeying the order" do
+      assert @stack_123 == Stack.from_list([1, 2, 3])
+      assert @stack_12 == Stack.from_list([1, 2])
+      assert @stack_1 == Stack.from_list([1])
+      assert @empty == Stack.from_list([])
+    end
+  end
+
   describe "push/2" do
     test "adds new entries to the stack" do
       stack = Stack.new()
@@ -62,6 +80,22 @@ defmodule StackTest do
     end
   end
 
+  describe "head/1" do
+    test "returns the first element in the stack" do
+      assert {:ok, 1} == Stack.head(@stack_123)
+      assert {:ok, 1} == Stack.head(@stack_12)
+      assert {:ok, 1} == Stack.head(@stack_1)
+      assert {:error, :empty} == Stack.head(@empty)
+    end
+  end
+
+  describe "head!/1" do
+    test "raises if stack is empty" do
+      assert 1 == Stack.head!(@stack_1)
+      assert_raise(MatchError, fn -> Stack.head!(Stack.new()) end)
+    end
+  end
+
   describe "empty?/1" do
     test "returns true if empty" do
       assert Stack.empty?(Stack.new())
@@ -103,15 +137,6 @@ defmodule StackTest do
       assert Stack.any?(@stack_123, 2)
       refute Stack.any?(@stack_12, 5)
       refute Stack.any?(@empty, nil)
-    end
-  end
-
-  describe "to_list/1" do
-    test "dumpts the stack into a list" do
-      assert Stack.to_list(@empty) == []
-      assert Stack.to_list(@stack_1) == [1]
-      assert Stack.to_list(@stack_12) == [1, 2]
-      assert Stack.to_list(@stack_123) == [1, 2, 3]
     end
   end
 

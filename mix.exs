@@ -14,6 +14,15 @@ defmodule Stack.Mixfile do
       aliases: aliases(),
       compilers: Mix.compilers(),
       elixirc_paths: elixirc_paths(Mix.env()),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.html": :test,
+        "coveralls.detail": :test,
+        "coveralls.json": :test,
+        "coveralls.post": :test
+      ],
+      dialyzer: [plt_add_apps: [:mix]],
       source_url: "https://github.com/renatomassaro/stack",
       docs: docs()
     ]
@@ -43,7 +52,10 @@ defmodule Stack.Mixfile do
 
   def deps do
     [
-      {:ex_doc, "~> 0.35", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.35", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
+      {:excoveralls, "~> 0.18", only: :test},
+      {:mix_test_watch, "~> 1.2", only: [:dev, :test], runtime: false}
     ]
   end
 
