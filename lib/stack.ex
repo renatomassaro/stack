@@ -1,4 +1,9 @@
 defmodule Stack do
+  @moduledoc "README.md"
+             |> File.read!()
+             |> String.split("<!-- MDOC !-->")
+             |> Enum.at(1)
+
   @enforce_keys [:entries]
   defstruct [:entries]
 
@@ -8,6 +13,13 @@ defmodule Stack do
 
   @spec new() :: generic_stack
   def new, do: %__MODULE__{entries: []}
+
+  @spec from_list([v]) :: generic_stack
+  def from_list(entries),
+    do: %__MODULE__{entries: Enum.reverse(entries)}
+
+  @spec to_list(generic_stack) :: [v]
+  def to_list(%__MODULE__{entries: entries}), do: Enum.reverse(entries)
 
   @spec push(generic_stack, v) :: generic_stack
   def push(%__MODULE__{entries: entries}, entry), do: %__MODULE__{entries: [entry | entries]}
@@ -32,8 +44,25 @@ defmodule Stack do
   def peek(%__MODULE__{entries: []}), do: {:error, :empty}
   def peek(%__MODULE__{entries: [entry | _]}), do: {:ok, entry}
 
+  @spec peek!(generic_stack) ::
+          v
+          | no_return
   def peek!(stack) do
     {:ok, v} = peek(stack)
+    v
+  end
+
+  @spec head(generic_stack) ::
+          {:ok, v}
+          | {:error, :empty}
+  def head(%__MODULE__{entries: []}), do: {:error, :empty}
+  def head(%__MODULE__{entries: entries}), do: {:ok, entries |> Enum.reverse() |> List.first()}
+
+  @spec head!(generic_stack) ::
+          v
+          | no_return
+  def head!(stack) do
+    {:ok, v} = head(stack)
     v
   end
 
@@ -59,9 +88,6 @@ defmodule Stack do
   @spec any?(generic_stack, (v -> boolean) | v) :: boolean
   def any?(stack, function_or_entry_to_find),
     do: not is_nil(find(stack, function_or_entry_to_find))
-
-  @spec to_list(generic_stack) :: [v]
-  def to_list(%__MODULE__{entries: entries}), do: Enum.reverse(entries)
 
   @spec size(generic_stack) :: integer
   def size(%__MODULE__{entries: entries}), do: length(entries)
@@ -89,23 +115,34 @@ defmodule Stack do
 
   def remove(%__MODULE__{} = stack, entry_to_remove), do: remove(stack, &(&1 == entry_to_remove))
 
+  @spec remove!(generic_stack, (v -> boolean) | v) ::
+          {generic_stack, v}
+          | no_return
   def remove!(%__MODULE__{} = stack, function_or_entry_to_find) do
     {:ok, result} = remove(stack, function_or_entry_to_find)
     result
   end
 
+  @spec reduce(generic_stack, (v, acc :: term -> acc :: term), initial_value :: term) ::
+          generic_stack
   def reduce(%__MODULE__{entries: entries}, reducer, initial_value) do
     Enum.reduce(entries, initial_value, fn entry, acc -> reducer.(entry, acc) end)
   end
 
+  @spec map(generic_stack, (v -> v)) ::
+          generic_stack
   def map(%__MODULE__{entries: entries}, mapper) do
     %__MODULE__{entries: Enum.map(entries, mapper)}
   end
 
+  @spec filter(generic_stack, (v -> boolean)) ::
+          generic_stack
   def filter(%__MODULE__{entries: entries}, filter_fn) when is_function(filter_fn) do
     %__MODULE__{entries: Enum.filter(entries, filter_fn)}
   end
 
+  @spec reject(generic_stack, (v -> boolean)) ::
+          generic_stack
   def reject(%__MODULE__{entries: entries}, reject_fn) when is_function(reject_fn) do
     %__MODULE__{entries: Enum.reject(entries, reject_fn)}
   end
